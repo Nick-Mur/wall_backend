@@ -36,7 +36,7 @@
 #  Связь между сущностями:
 - Message → references → Message
 - Message → author_id
-- earch работает только с Message где hidden = false
+- Search работает только с Message где hidden = false
 
 #  Ограничения:
 1. text:
