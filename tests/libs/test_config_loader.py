@@ -223,3 +223,6 @@ class TakeConfigLoader(unittest.TestCase):
         # then
         self.assertEqual(loader.cast_type('{"name": "John"}'), {"name": "John"})
         self.assertEqual(loader.cast_type('{"x": 1, "y": 2}'), {"x": 1, "y": 2})
+
+if __name__ == "__main__":
+    unittest.main()
