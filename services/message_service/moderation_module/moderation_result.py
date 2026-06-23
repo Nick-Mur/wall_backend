@@ -5,13 +5,12 @@ from services.message_service.domain.moderation import ModerationVerdict, Modera
 
 @dataclass
 class ModerationResult:
-    class ModerationResult:
-        verdict: ModerationVerdict = ModerationVerdict.APPROVED
-        reason: Optional[ModerationReason] = None
-        warnings: List[ModerationWarning] = field(default_factory=list)
+    verdict: ModerationVerdict = ModerationVerdict.APPROVED
+    reason: Optional[ModerationReason] = None
+    warnings: List[ModerationWarning] = field(default_factory=list)
 
-        @property
-        def is_rejected(self) -> bool:
-            return self.verdict == ModerationVerdict.REJECTED
+    @property
+    def is_rejected(self) -> bool:
+        return self.verdict == ModerationVerdict.REJECTED
 
 
