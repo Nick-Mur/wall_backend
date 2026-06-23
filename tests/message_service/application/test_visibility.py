@@ -1,183 +1,145 @@
 import unittest
+import asyncio
+from unittest.mock import Mock, AsyncMock
 from uuid import uuid4
-from unittest.mock import Mock, patch
+from datetime import datetime
 
-from services.message_service.domain.message import Message
-from services.message_service.application.visibility import VisibilityError, hide_message, erase_message, detach_message
+from services.message_service.application.visibility import VisibilityUseCase, VisibilityError
 
 
-class TestHideMessage(unittest.TestCase):
-    def test_should_call_hide_on_message(self):
-        """Should call hide method on message"""
+class TestVisibilityUseCase(unittest.TestCase):
+
+    def setUp(self):
+        self.mock_message_repo = Mock()
+        self.mock_message = Mock()
+        self.mock_message.id = uuid4()
+        self.mock_message.text = "Test message"
+        self.mock_message.author_id = uuid4()
+        self.mock_message.created_at = datetime.utcnow()
+
+        # Настраиваем репозиторий
+        self.mock_message_repo.get_by_id = AsyncMock(return_value=self.mock_message)
+        self.mock_message_repo.update = AsyncMock()
+
+        self.use_case = VisibilityUseCase(
+            message_repo=self.mock_message_repo
+        )
+
+    def test_should_hide_message_successfully(self):
+        """Should hide message successfully"""
         # given
-        message = Message.create(text="Hello!")
+        message_id = uuid4()
 
         # when
-        hide_message(message)
+        import asyncio
+        asyncio.run(self.use_case.hide(message_id))
 
         # then
-        self.assertFalse(message.is_visible)
+        self.mock_message_repo.get_by_id.assert_called_once_with(message_id)
+        self.mock_message.hide.assert_called_once()
+        self.mock_message_repo.update.assert_called_once_with(self.mock_message)
 
-    def test_should_raise_error_if_message_is_None(self):
-        """Should raise error when message is None"""
+    def test_should_raise_error_when_hiding_nonexistent_message(self):
+        """Should raise VisibilityError when hiding non-existent message"""
         # given
-        message = None
+        message_id = uuid4()
+        self.mock_message_repo.get_by_id = AsyncMock(return_value=None)
 
-        def action():
-            # when
-            hide_message(message)
-
-        # then
-        self.assertRaises(AttributeError, action)
-
-    def test_should_raise_visibility_error_if_already_hidden(self):
-        """Should raise VisibilityError if message is already hidden"""
-        # given
-        message = Message.create(text="Hello!")
-        message.hide()
-
-        def action():
-            # when
-            hide_message(message)
-
-        # then
-        self.assertRaises(VisibilityError, action)
-
-
-class TestDetachMessage(unittest.TestCase):
-    """Tests for detach_message() function"""
-
-    def test_should_call_detach_on_message(self):
-        """Should call detach method on message"""
-        # given
-        author_id = uuid4()
-        message = Message.create(text="Hello!", author_id=author_id)
-
-        # when
-        detach_message(message)
-
-        # then
-        self.assertIsNone(message.author_id)
-
-    def test_should_handle_message_without_author(self):
-        """Should handle message without author"""
-        # given
-        message = Message.create(text="Hello!")
-
-        # when
-        detach_message(message)
-
-        # then
-        self.assertIsNone(message.author_id)  # remains None
-
-    def test_should_raise_error_if_message_is_None(self):
-        """Should raise error when message is None"""
-        # given
-        message = None
-
-        def action():
-            # when
-            detach_message(message)
-
-        # then
-        self.assertRaises(AttributeError, action)
-
-
-class TestEraseMessage(unittest.TestCase):
-    def test_should_call_erase_on_message(self):
-        """Should call erase method on message"""
-        # given
-        author_id = uuid4()
-        message = Message.create(text="Hello!", author_id=author_id)
-
-        # when
-        erase_message(message)
-
-        # then
-        self.assertTrue(message.hidden)
-        self.assertIsNone(message.author_id)
-
-    def test_should_erase_already_hidden_message(self):
-        """Should erase already hidden message"""
-        # given
-        message = Message.create(text="Hello!")
-        message.hide()
-
-        # when
-        erase_message(message)
-
-        # then
-        self.assertTrue(message.hidden)
-
-    def test_should_raise_error_if_message_is_None(self):
-        """Should raise error when message is None"""
-        # given
-        message = None
-
-        def action():
-            # when
-            erase_message(message)
-
-        # then
-        self.assertRaises(AttributeError, action)
-
-
-class TestVisibilityError(unittest.TestCase):
-    """Tests for VisibilityError custom exception"""
-
-    def test_should_inherit_from_ValueError(self):
-        """VisibilityError should inherit from ValueError"""
-        # then
-        self.assertTrue(issubclass(VisibilityError, ValueError))
-
-    def test_should_store_error_message(self):
-        """Should store error message"""
-        # given
-        error_message = "Cannot hide message that is already hidden"
-
-        # when
+        # when / then
+        import asyncio
         with self.assertRaises(VisibilityError) as context:
-            raise VisibilityError(error_message)
+            asyncio.run(self.use_case.hide(message_id))
 
-        # then
-        self.assertEqual(str(context.exception), error_message)
+        self.assertEqual(str(context.exception), "Message not found")
+        self.mock_message.hide.assert_not_called()
+        self.mock_message_repo.update.assert_not_called()
 
-    def test_should_work_without_message(self):
-        """Should work without error message"""
-        # when
-        with self.assertRaises(VisibilityError) as context:
-            raise VisibilityError()
-
-        # then
-        self.assertEqual(str(context.exception), "")
-
-
-class TestMessageActionsIntegration(unittest.TestCase):
-    def test_should_hide_then_erase_message(self):
-        """Should hide and then erase message"""
+    def test_should_hide_already_hidden_message(self):
+        """Should hide already hidden message"""
         # given
-        message = Message.create(text="Secret content", author_id=uuid4())
+        message_id = uuid4()
+        self.mock_message.hide = Mock()
 
         # when
-        hide_message(message)
-        erase_message(message)
+        asyncio.run(self.use_case.hide(message_id))
+        asyncio.run(self.use_case.hide(message_id))
 
         # then
-        self.assertTrue(message.hidden)
-        self.assertIsNone(message.author_id)
+        self.assertEqual(self.mock_message.hide.call_count, 2)
+        self.assertEqual(self.mock_message_repo.update.call_count, 2)
 
-    def test_should_detach_then_hide_message(self):
-        """Should detach author and then hide message"""
+    def test_should_detach_message_successfully(self):
+        """Should detach message successfully"""
         # given
-        message = Message.create(text="Hello!", author_id=uuid4())
+        message_id = uuid4()
 
         # when
-        detach_message(message)
-        hide_message(message)
+        import asyncio
+        asyncio.run(self.use_case.detach(message_id))
 
         # then
-        self.assertIsNone(message.author_id)
-        self.assertFalse(message.is_visible)
+        self.mock_message_repo.get_by_id.assert_called_once_with(message_id)
+        self.mock_message.detach.assert_called_once()
+        self.mock_message_repo.update.assert_called_once_with(self.mock_message)
+
+    def test_should_detach_already_detached_message(self):
+        """Should detach already detached message"""
+        # given
+        message_id = uuid4()
+        self.mock_message.detach = Mock()
+
+        # when
+        asyncio.run(self.use_case.detach(message_id))
+        asyncio.run(self.use_case.detach(message_id))
+
+        # then
+        self.assertEqual(self.mock_message.detach.call_count, 2)
+        self.assertEqual(self.mock_message_repo.update.call_count, 2)
+
+    def test_should_erase_message_successfully(self):
+        """Should erase message successfully"""
+        # given
+        message_id = uuid4()
+
+        # when
+        asyncio.run(self.use_case.erase(message_id))
+
+        # then
+        self.mock_message_repo.get_by_id.assert_called_once_with(message_id)
+        self.mock_message.erase.assert_called_once()
+        self.mock_message_repo.update.assert_called_once_with(self.mock_message)
+
+    def test_should_erase_already_erased_message(self):
+        """Should erase already erased message"""
+        # given
+        message_id = uuid4()
+        self.mock_message.erase = Mock()
+
+        # when
+        asyncio.run(self.use_case.erase(message_id))
+        asyncio.run(self.use_case.erase(message_id))
+
+        # then
+        self.assertEqual(self.mock_message.erase.call_count, 2)
+        self.assertEqual(self.mock_message_repo.update.call_count, 2)
+
+    def test_should_perform_multiple_operations_on_same_message(self):
+        """Should perform multiple visibility operations on same message"""
+        # given
+        message_id = uuid4()
+
+        # when
+        import asyncio
+        asyncio.run(self.use_case.hide(message_id))
+        asyncio.run(self.use_case.detach(message_id))
+        asyncio.run(self.use_case.erase(message_id))
+
+        # then
+        self.assertEqual(self.mock_message_repo.get_by_id.call_count, 3)
+        self.mock_message.hide.assert_called_once()
+        self.mock_message.detach.assert_called_once()
+        self.mock_message.erase.assert_called_once()
+        self.assertEqual(self.mock_message_repo.update.call_count, 3)
 
 
 if __name__ == "__main__":

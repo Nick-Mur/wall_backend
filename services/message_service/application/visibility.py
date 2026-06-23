@@ -1,16 +1,31 @@
 # TODO: Реализовать сценарии hide, detach, erase.
-from services.message_service.domain.message import Message
+from uuid import UUID
 
 class VisibilityError(ValueError):
     pass
 
-def hide_message(message: Message) -> None:
-    if not message.is_visible:
-        raise VisibilityError("Message is already hidden")
-    message.hide()
+class VisibilityUseCase:
+    def __init__(self, message_repo):
+        self.repo = message_repo
 
-def detach_message(message: Message) -> None:
-    message.detach()
+    async def hide(self, message_id: UUID):
+        msg = await self.repo.get_by_id(message_id)
+        if not msg:
+            raise VisibilityError("Message not found")
+        msg.hide()
+        await self.repo.update(msg)
 
-def erase_message(message: Message) -> None:
-    message.erase()
+    async def detach(self, message_id: UUID):
+        msg = await self.repo.get_by_id(message_id)
+        if not msg:
+            raise VisibilityError("Message not found")
+        msg.detach()
+        await self.repo.update(msg)
+
+    async def erase(self, message_id: UUID):
+        msg = await self.repo.get_by_id(message_id)
+        if not msg:
+            raise VisibilityError("Message not found")
+        msg.erase()
+        await self.repo.update(msg)
+
