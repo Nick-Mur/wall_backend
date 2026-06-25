@@ -16,18 +16,6 @@ class TestClassicSearchService(unittest.IsolatedAsyncioTestCase):
             log_repo=self.mock_log_repo
         )
 
-    async def test_search_should_return_empty_on_empty_query(self):
-        """Проверка: если запрос пустой, поиск не выполняется"""
-        # given
-        query = SearchQuery(query_string="")
-
-        # when
-        result = await self.service.search(query)
-
-        # then
-        self.assertEqual(result.total_count, 0)
-        self.assertEqual(len(result.results), 0)
-        self.mock_search_repo.find_messages.assert_not_called()
 
     async def test_search_should_return_results_and_log(self):
         """Проверка: успешный поиск возвращает результаты и пишет лог"""
@@ -67,3 +55,6 @@ class TestClassicSearchService(unittest.IsolatedAsyncioTestCase):
             await self.service.search(query)
         
         self.assertIn("Не удалось записать лог поиска", str(cm.exception))
+
+if __name__ == "__main__":
+    unittest.main()

@@ -1,9 +1,9 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func, text
 from sqlalchemy.sql import literal_column
-from message_service.domain.message import MessageModel
-from search_service.domain.search_result import SearchResult
-from search_service.domain.search_request import SearchQuery
+from services.message_service.infrastructure.db_models.message import MessageModel
+from services.search_service.domain.search_result import SearchResult
+from services.search_service.domain.search_request import SearchQuery
 
 class ClassicSearchRepository:
     """

@@ -8,7 +8,7 @@ class TestSearchQuery(unittest.TestCase):
     def test_init_with_valid_query_string(self):
         """Проверка успешного создания объекта с корректной строкой запроса."""
         # given
-        query_string = "test search query"
+        query_string = "тест"
 
         # when
         query = SearchQuery(query_string=query_string)
@@ -41,7 +41,7 @@ class TestSearchQuery(unittest.TestCase):
     def test_to_tsquery_string_returns_correct_format(self):
         """Проверка, что метод to_tsquery_string возвращает исходную строку."""
         # given
-        query_string = "test query with spaces & symbols!"
+        query_string = "тест с ! знаками . препинания :"
 
         # when
         query = SearchQuery(query_string=query_string)
@@ -54,7 +54,7 @@ class TestSearchQuery(unittest.TestCase):
     def test_tsquery_func_returns_correct_function_name(self):
         """Проверка, что метод tsquery_func возвращает правильное имя функции."""
         # given
-        query_string = "any valid query" 
+        query_string = "тест" 
 
         # when
         query = SearchQuery(query_string=query_string)
@@ -62,3 +62,6 @@ class TestSearchQuery(unittest.TestCase):
 
         # then
         self.assertEqual(func_name, "plainto_tsquery")
+
+if __name__ == "__main__":
+    unittest.main()
