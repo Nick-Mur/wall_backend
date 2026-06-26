@@ -4,6 +4,6 @@
     "port": 8003
   },
   "database": {
-    "url": "postgresql+asyncpg://wall:wall@localhost:5432/the_wall_test"
+    "url": "postgresql+asyncpg://wall:wall@localhost:5433/the_wall_test"
   }
 }
