@@ -62,8 +62,7 @@ class ClassicSearchRepository:
                     )
                 )
             except ValueError as e:
-                print(f"Ошибка при создании SearchResult из строки БД: {e}. Строка: {row}")
-                continue 
+                raise ValueError(f"Ошибка при создании SearchResult из строки БД: {e}. Строка: {row}")
         
         return results
 
