@@ -12,4 +12,9 @@ app = create_app(
 )
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8002)
+    server_config = config.get("server", {})
+    uvicorn.run(
+        app,
+        host=server_config.get("host", "0.0.0.0"),
+        port=int(server_config.get("port", 8002)),
+    )
