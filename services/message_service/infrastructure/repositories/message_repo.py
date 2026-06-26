@@ -1,7 +1,6 @@
 # TODO: Реализовать репозиторий записей.
 from uuid import UUID
 
-from docutils.nodes import author
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, update
 from services.message_service.infrastructure.db_models.message import MessageModel
