@@ -1,4 +1,11 @@
 import unittest
+
+import pytest
+
+# Qdrant is a stub for now.
+# Skip this module.
+pytest.importorskip("qdrant_client")
+
 from libs.qdrant.client import AsyncQdrantClient, QdrantClientFactory
 
 

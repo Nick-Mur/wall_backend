@@ -5,11 +5,12 @@ import pytest_asyncio
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy import delete
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.pool import NullPool
 
 if "TEST_DATABASE_URL" in os.environ:
     os.environ["DATABASE_URL"] = os.environ["TEST_DATABASE_URL"]
 else:
-    os.environ.setdefault("DATABASE_URL", "postgresql+asyncpg://wall:wall@localhost:5432/the_wall_test")
+    os.environ.setdefault("DATABASE_URL", "postgresql+asyncpg://wall:wall@localhost:5433/the_wall_test")
 
 from libs.postgres.base import Base
 from services.message_service.api.router import (
@@ -29,7 +30,7 @@ from services.search_service.main import app as search_app
 
 TEST_DATABASE_URL = os.getenv("TEST_DATABASE_URL", os.environ["DATABASE_URL"])
 
-test_engine = create_async_engine(TEST_DATABASE_URL, echo=False)
+test_engine = create_async_engine(TEST_DATABASE_URL, echo=False, poolclass=NullPool)
 TestSessionFactory = async_sessionmaker(
     bind=test_engine,
     class_=AsyncSession,
@@ -75,6 +76,12 @@ async def clean_db(db_schema):
     await clear_database()
     yield
     await clear_database()
+
+
+@pytest_asyncio.fixture
+async def db_session(clean_db):
+    async with TestSessionFactory() as session:
+        yield session
 
 
 @pytest_asyncio.fixture

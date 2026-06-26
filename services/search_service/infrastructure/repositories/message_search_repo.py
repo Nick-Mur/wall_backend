@@ -1,9 +1,12 @@
-from sqlalchemy import func, select
+from sqlalchemy import func, literal_column, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from services.message_service.infrastructure.db_models.message import MessageModel
 from services.search_service.domain.search_request import SearchQuery
 from services.search_service.domain.search_result import SearchResult
+
+# Keep FTS config inline in SQL: ts_headline('simple', ...).
+_TS_CONFIG = literal_column("'simple'")
 
 
 class ClassicSearchRepository:
@@ -12,7 +15,7 @@ class ClassicSearchRepository:
 
     async def find_messages(self, query: SearchQuery) -> list[SearchResult]:
         tsquery = self._tsquery(query)
-        snippet = func.ts_headline("simple", MessageModel.text, tsquery).label("snippet")
+        snippet = func.ts_headline(_TS_CONFIG, MessageModel.text, tsquery).label("snippet")
         rank = func.ts_rank(MessageModel.tsv, tsquery).label("rank")
 
         stmt = (
@@ -61,4 +64,4 @@ class ClassicSearchRepository:
 
     def _tsquery(self, query: SearchQuery):
         tsquery_func = getattr(func, query.tsquery_func())
-        return tsquery_func("simple", query.to_tsquery_string())
+        return tsquery_func(_TS_CONFIG, query.to_tsquery_string())
