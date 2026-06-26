@@ -10,7 +10,8 @@ class SearchResponse:
     def has_results(self) -> bool:
         """Возвращает True, если в ответе есть хотя бы один результат."""
         return len(self.results) > 0
-
+    
+    @classmethod
     def create_empty(cls) -> "SearchResponse":
         """Создает пустой ответ если результатов не найдено"""
         return cls(results=[], total_count=0)

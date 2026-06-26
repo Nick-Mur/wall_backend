@@ -100,3 +100,6 @@ class TestSearchResponse(unittest.TestCase):
         self.assertEqual(response1.results, response2.results)
         self.assertEqual(response1.total_count, response2.total_count)
         self.assertEqual(response1.has_results(), response2.has_results())
+
+if __name__ == "__main__":
+    unittest.main()
