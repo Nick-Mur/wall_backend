@@ -1,6 +1,3 @@
-# TODO: Реализовать шаг проверки запрещённых слов.
-from pyexpat.errors import messages
-
 from services.message_service.moderation_module.step import ModerationStep
 from services.message_service.domain.moderation import ModerationReason
 

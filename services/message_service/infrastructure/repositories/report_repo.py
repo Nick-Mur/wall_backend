@@ -1,6 +1,5 @@
-# TODO: Реализовать репозиторий жалоб.
 from uuid import UUID
-from typing import List, Optional
+
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from services.message_service.infrastructure.db_models.report import ReportModel
@@ -21,14 +20,14 @@ class ReportRepository:
         await self.session.refresh(report)
         return report
 
-    async def get_by_id(self, report_id: UUID) -> Optional[ReportModel]:
+    async def get_by_id(self, report_id: UUID) -> ReportModel | None:
         """Найти жалобу по её идентификатору."""
         result = await self.session.execute(
             select(ReportModel).where(ReportModel.id == report_id)
         )
         return result.scalar_one_or_none()
 
-    async def get_by_message_id(self, message_id: UUID) -> List[ReportModel]:
+    async def get_by_message_id(self, message_id: UUID) -> list[ReportModel]:
         """Получить список всех жалоб на конкретное сообщение."""
         result = await self.session.execute(
             select(ReportModel).where(ReportModel.message_id == message_id)

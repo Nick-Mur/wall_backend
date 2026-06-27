@@ -1,12 +1,10 @@
-# TODO: Описать интерфейс шага модерации.
 from abc import ABC, abstractmethod
-from typing import Optional, Union
 
-from services.message_service.domain.moderation import ModerationWarning, ModerationReason
+from services.message_service.domain.moderation import ModerationReason, ModerationWarning
 
 
-# задает только шаблон для других классов
+# задаёт только шаблон для других классов
 class ModerationStep(ABC):
     @abstractmethod
-    async def process(self, text: str) -> Optional[Union[ModerationWarning, ModerationReason]]:
-        pass
+    async def process(self, text: str) -> ModerationWarning | ModerationReason | None:
+        ...

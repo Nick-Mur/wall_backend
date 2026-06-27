@@ -1,16 +1,15 @@
 # TODO: Реализовать шаг normalization.
 import re
-from typing import Optional, Union
 
 from services.message_service.moderation_module.step import ModerationStep
-from services.message_service.domain.moderation import ModerationWarning, ModerationReason
+from services.message_service.domain.moderation import ModerationWarning
 
 MAX_SPACES_SEQUENCE = 3
 MAX_NEWLINES_SEQUENCE = 3
 
 
 class NormalizationStep(ModerationStep):
-    def process(self, text: str) -> Optional[ModerationWarning]:
+    def process(self, text: str) -> ModerationWarning | None:
         if not text:
             return None
         space_reg = rf'[ \t]{{{MAX_SPACES_SEQUENCE + 1},}}'

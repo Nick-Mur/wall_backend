@@ -10,9 +10,6 @@ class ClassicSearchService:
         self.log_repo = log_repo
 
     async def search(self, query: SearchQuery) -> SearchResponseSchema:
-        if not query.query_string:
-            return SearchResponseSchema(results=[], total_count=0)
-
         internal = await self.repository.find_messages(query)
         total = await self.repository.count_total_results(query)
 
