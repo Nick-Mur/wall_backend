@@ -1,6 +1,6 @@
 from .step import ModerationStep
 
 
-class BaseModerationPipline:
+class BaseModerationPipeline:
     def __init__(self, steps: list[ModerationStep]):
         self.steps = steps
