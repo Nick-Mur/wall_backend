@@ -34,8 +34,8 @@ class TestErrorHandlers(unittest.TestCase):
 
         self.client = TestClient(self.app)
 
-    def test_should_return_400_for_missing_field(self):
-        """Should return 400 for missing required field"""
+    def test_should_return_422_for_missing_field(self):
+        """Should return 422 for missing required field"""
         # given
         data = {"name": "Sergey", "age": 100}
 
@@ -43,13 +43,13 @@ class TestErrorHandlers(unittest.TestCase):
         response = self.client.post("/users/", json=data)
 
         # then
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 422)
         data = response.json()
         self.assertEqual(data["error"], "RequestValidationError")
-        self.assertIn("email", data["message"].lower())
+        self.assertEqual(data["detail"][0]["loc"], ["body", "email"])
 
-    def test_should_return_400_for_wrong_type(self):
-        """Should return 400 for wrong field type"""
+    def test_should_return_422_for_wrong_type(self):
+        """Should return 422 for wrong field type"""
         # given
         data = {
             "name": "Sergey",
@@ -61,13 +61,14 @@ class TestErrorHandlers(unittest.TestCase):
         response = self.client.post("/users/", json=data)
 
         # then
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 422)
         data = response.json()
         self.assertEqual(data["error"], "RequestValidationError")
-        self.assertIn("integer", data["message"].lower())
+        self.assertEqual(data["detail"][0]["loc"], ["body", "age"])
+        self.assertIn("integer", data["detail"][0]["msg"].lower())
 
-    def test_should_return_400_for_extra_field(self):
-        """Should return 400 for extra field"""
+    def test_should_return_422_for_extra_field(self):
+        """Should return 422 for extra field"""
         # given
         data = {
             "name": "Anna",
@@ -80,10 +81,10 @@ class TestErrorHandlers(unittest.TestCase):
         response = self.client.post("/users/", json=data)
 
         # then
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 422)
         data = response.json()
         self.assertEqual(data["error"], "RequestValidationError")
-        self.assertIn("extra", data["message"].lower())
+        self.assertEqual(data["detail"][0]["loc"], ["body", "extra"])
 
     def test_should_return_200_for_valid_data(self):
         """Should return 200 for valid data"""
@@ -113,12 +114,21 @@ class TestErrorHandlers(unittest.TestCase):
         response = self.client.post("/users/", json=data)
 
         # then
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 422)
         data = response.json()
         self.assertIn("error", data)
-        self.assertIn("message", data)
+        self.assertIn("detail", data)
         self.assertIsInstance(data["error"], str)
-        self.assertIsInstance(data["message"], str)
+        self.assertIsInstance(data["detail"], list)
+
+    def test_should_not_expose_validation_context(self):
+        data = {"name": "Sergey", "age": "not_number", "email": "test@example.com"}
+
+        response = self.client.post("/users/", json=data)
+
+        self.assertEqual(response.status_code, 422)
+        error = response.json()["detail"][0]
+        self.assertNotIn("ctx", error)
 
 
 if __name__ == "__main__":
