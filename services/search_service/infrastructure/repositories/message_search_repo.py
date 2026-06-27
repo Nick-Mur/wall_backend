@@ -60,8 +60,7 @@ class ClassicSearchRepository:
 
         result = await self.session.execute(stmt)
 
-        return result.scalar() if result else 0
+        return result.scalar_one()
 
     def _tsquery(self, query: SearchQuery):
-        tsquery_func = getattr(func, query.tsquery_func())
-        return tsquery_func(_TS_CONFIG, query.to_tsquery_string())
+        return func.plainto_tsquery(_TS_CONFIG, query.query_string)
