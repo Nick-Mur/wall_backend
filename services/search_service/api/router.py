@@ -40,16 +40,8 @@ async def search_messages_route(
     query_string: str = Query(..., description="Строка для поиска сообщений"),
     search_service: ClassicSearchService = Depends(get_search_service),
 ):
-    """
-    Обработчик для эндпоинта поиска сообщений.
-    """
     try:
         search_query = SearchQuery(query_string)
         return await search_service.search(search_query)
     except ValueError as ve:
         raise HTTPException(status_code=400, detail=str(ve))
-    except Exception:
-        raise HTTPException(
-            status_code=500,
-            detail="Внутренняя ошибка сервера при выполнении поиска.",
-        )

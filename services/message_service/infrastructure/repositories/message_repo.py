@@ -24,6 +24,17 @@ class MessageRepository:
             return None
         return Message(id=model.id, text=model.text, author_id=model.author_id, hidden=model.hidden,
                        created_at=model.created_at)
+
+    async def missing_ids(self, message_ids: list[UUID]) -> list[UUID]:
+        if not message_ids:
+            return []
+
+        result = await self.session.execute(
+            select(MessageModel.id).where(MessageModel.id.in_(message_ids))
+        )
+        existing_ids = set(result.scalars().all())
+        return [message_id for message_id in message_ids if message_id not in existing_ids]
+
     async def update(self, message: Message):
         await self.session.execute(
             update(MessageModel)

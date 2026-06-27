@@ -19,7 +19,7 @@ router = APIRouter(prefix="/messages", tags=["Messages"])
 
 
 def build_hard_pipeline() -> HardModerationPipeline:
-    return HardModerationPipeline([BanWordsStep(forbidden_words=[])])
+    return HardModerationPipeline([BanWordsStep(forbidden_words=['fuck'])])
 
 
 def build_soft_pipeline() -> SoftModerationPipeline:

@@ -17,3 +17,8 @@ class MessageModel(Base):
     author_id = Column(UUID(as_uuid=True), nullable=True)
     hashes = relationship("MessageHashModel", back_populates="message", cascade="all, delete-orphan")
     moderation_logs = relationship("ModerationLogModel", back_populates="message")
+
+
+# Register related mapped classes used by string-based relationships above.
+from services.message_service.infrastructure.db_models.message_hash import MessageHashModel  # noqa: E402,F401
+from services.message_service.infrastructure.db_models.moderation_log import ModerationLogModel  # noqa: E402,F401
