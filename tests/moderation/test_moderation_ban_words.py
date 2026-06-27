@@ -44,7 +44,7 @@ class TestBanWordsStep(unittest.TestCase):
         self.assertIsInstance(result, ModerationReason)
         self.assertEqual(result.code, "BAN_WORDS")
         self.assertEqual(result.message, "Banned word detected: hate")
-        self.assertEqual(result.to_message(), "Banned word detected: hate")
+        self.assertEqual(result.message, "Banned word detected: hate")
 
     def test_should_detect_banned_word_in_uppercase(self):
         """Detect banned word in uppercase"""

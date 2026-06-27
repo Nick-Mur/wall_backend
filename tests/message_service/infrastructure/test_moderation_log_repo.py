@@ -23,10 +23,10 @@ class TestModerationLogRepository(unittest.TestCase):
             result.verdict = MagicMock()
             result.verdict.value = "REJECTED"
             result.warnings = [
-                MagicMock(to_message=lambda: "Contains profanity"),
-                MagicMock(to_message=lambda: "Looks like spam")
+                MagicMock(message="Contains profanity"),
+                MagicMock(message="Looks like spam")
             ]
-            result.reason = MagicMock(to_message=lambda: "Content violates community guidelines")
+            result.reason = MagicMock(message="Content violates community guidelines")
 
             mock_log_entry = MagicMock()
 
@@ -94,7 +94,7 @@ class TestModerationLogRepository(unittest.TestCase):
             result = MagicMock()
             result.verdict = MagicMock()
             result.verdict.value = "FLAGGED"
-            result.warnings = [MagicMock(to_message=lambda: "Suspicious content")]
+            result.warnings = [MagicMock(message="Suspicious content")]
             result.reason = None
 
             # when
@@ -155,10 +155,10 @@ class TestModerationLogRepository(unittest.TestCase):
             result.verdict = MagicMock()
             result.verdict.value = "REJECTED"
             result.warnings = [
-                MagicMock(to_message=lambda: "Contains profanity"),
-                MagicMock(to_message=lambda: "Looks like spam")
+                MagicMock(message="Contains profanity"),
+                MagicMock(message="Looks like spam")
             ]
-            result.reason = MagicMock(to_message=lambda: "Content violates community guidelines")
+            result.reason = MagicMock(message="Content violates community guidelines")
 
             # when
             with patch(
@@ -185,7 +185,7 @@ class TestModerationLogRepository(unittest.TestCase):
             result = MagicMock()
             result.verdict = MagicMock()
             result.verdict.value = "FLAGGED"
-            result.warnings = [MagicMock(to_message=lambda: "Suspicious content")]
+            result.warnings = [MagicMock(message="Suspicious content")]
             result.reason = None
 
             # when
@@ -242,7 +242,7 @@ class TestModerationLogRepository(unittest.TestCase):
             result = MagicMock()
             result.verdict = MagicMock()
             result.verdict.value = "FLAGGED"
-            result.warnings = [MagicMock(to_message=lambda: "Custom warning message")]
+            result.warnings = [MagicMock(message="Custom warning message")]
             result.reason = None
 
             # when
@@ -268,11 +268,11 @@ class TestModerationLogRepository(unittest.TestCase):
             result.verdict = MagicMock()
             result.verdict.value = "REJECTED"
             result.warnings = [
-                MagicMock(to_message=lambda: "Warning 1"),
-                MagicMock(to_message=lambda: "Warning 2"),
-                MagicMock(to_message=lambda: "Warning 3")
+                MagicMock(message="Warning 1"),
+                MagicMock(message="Warning 2"),
+                MagicMock(message="Warning 3")
             ]
-            result.reason = MagicMock(to_message=lambda: "Multiple violations")
+            result.reason = MagicMock(message="Multiple violations")
 
             # when
             with patch(
@@ -323,8 +323,8 @@ class TestModerationLogRepository(unittest.TestCase):
             result = MagicMock()
             result.verdict = MagicMock()
             result.verdict.value = "REJECTED"
-            result.warnings = [MagicMock(to_message=lambda: "Warning")]
-            result.reason = MagicMock(to_message=lambda: None)
+            result.warnings = [MagicMock(message="Warning")]
+            result.reason = MagicMock(message=None)
 
             # when
             with patch(
@@ -373,7 +373,7 @@ class TestModerationLogRepository(unittest.TestCase):
             result = MagicMock()
             result.verdict = MagicMock()
             result.verdict.value = "FLAGGED"
-            result.warnings = [MagicMock(to_message=lambda: "Single warning")]
+            result.warnings = [MagicMock(message="Single warning")]
             result.reason = None
 
             # when

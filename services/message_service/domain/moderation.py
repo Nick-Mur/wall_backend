@@ -14,14 +14,8 @@ class ModerationWarning:
     code: str
     message: str
 
-    def to_message(self) -> str:
-        return self.message
-
 
 @dataclass
 class ModerationReason:
     code: str
     message: str
-
-    def to_message(self) -> str:
-        return self.message
