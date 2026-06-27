@@ -1,9 +1,12 @@
-# TODO: Реализовать создание engine/session и Unit of Work при необходимости.
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
+import os
 from typing import AsyncGenerator
 
-DATABASE_URL = "postgresql+asyncpg://user:password@localhost:5432/the_wall"
-engine = create_async_engine(DATABASE_URL, echo=True)
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+
+DATABASE_URL = os.getenv("DATABASE_URL","postgresql+asyncpg://wall:wall@localhost:5433/the_wall_test",)
+DATABASE_ECHO = os.getenv("DATABASE_ECHO", "false").lower() == "true"
+
+engine = create_async_engine(DATABASE_URL, echo=DATABASE_ECHO)
 
 AsyncSessionFactory = async_sessionmaker(
     bind=engine,
@@ -18,7 +21,6 @@ async def get_session() -> AsyncGenerator[AsyncSession, None]:
 
 
 class UnitOfWork:
-
     def __init__(self, session: AsyncSession):
         self.session = session
 
