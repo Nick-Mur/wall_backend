@@ -1,6 +1,5 @@
-# TODO: Реализовать репозиторий связей между записями.
 from uuid import UUID
-from typing import List
+
 from sqlalchemy.ext.asyncio import AsyncSession
 from services.message_service.infrastructure.db_models.message_link import MessageLinkModel
 
@@ -9,7 +8,7 @@ class MessageLinkRepository:
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    async def add_links(self, source_id: UUID, target_ids: List[UUID]):
+    async def add_links(self, source_id: UUID, target_ids: list[UUID]):
         if not target_ids:
             return
 
