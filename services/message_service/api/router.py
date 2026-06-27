@@ -9,17 +9,13 @@ from services.message_service.application.publish import PublishMessage
 from services.message_service.application.visibility import VisibilityError, VisibilityUseCase
 from services.message_service.infrastructure.message_index import NullIndexer
 from services.message_service.infrastructure.repositories.message_hash_repo import MessageHashRepository
+from services.message_service.infrastructure.repositories.message_link_repo import MessageLinkRepository
 from services.message_service.infrastructure.repositories.message_repo import MessageRepository
 from services.message_service.moderation_module.pipeline import HardModerationPipeline, SoftModerationPipeline
 from services.message_service.moderation_module.steps.ban_words import BanWordsStep
 from services.message_service.moderation_module.steps.pii import PIIStep
 
 router = APIRouter(prefix="/messages", tags=["Messages"])
-
-
-async def get_db_session_dependency() -> AsyncSession:
-    async for session in get_session():
-        yield session
 
 
 def build_hard_pipeline() -> HardModerationPipeline:
@@ -31,7 +27,7 @@ def build_soft_pipeline() -> SoftModerationPipeline:
 
 
 async def get_publish_use_case(
-    session: AsyncSession = Depends(get_db_session_dependency),
+    session: AsyncSession = Depends(get_session),
 ) -> PublishMessage:
     return PublishMessage(
         message_repo=MessageRepository(session),
@@ -39,11 +35,12 @@ async def get_publish_use_case(
         hard_pipe=build_hard_pipeline(),
         soft_pipe=build_soft_pipeline(),
         indexer=NullIndexer(),
+        link_repo=MessageLinkRepository(session),
     )
 
 
 async def get_visibility_use_case(
-    session: AsyncSession = Depends(get_db_session_dependency),
+    session: AsyncSession = Depends(get_session),
 ) -> VisibilityUseCase:
     return VisibilityUseCase(MessageRepository(session))
 

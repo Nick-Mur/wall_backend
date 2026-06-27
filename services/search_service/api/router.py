@@ -15,16 +15,11 @@ from services.search_service.infrastructure.repositories.search_log_repo import 
 router = APIRouter(prefix="/search", tags=["Search"])
 
 
-async def get_db_session_dependency() -> AsyncSession:
-    async for session in get_session():
-        yield session
-
-
-async def get_search_repository(session: AsyncSession = Depends(get_db_session_dependency)) -> ClassicSearchRepository:
+async def get_search_repository(session: AsyncSession = Depends(get_session)) -> ClassicSearchRepository:
     return ClassicSearchRepository(session)
 
 
-async def get_search_log_repository(session: AsyncSession = Depends(get_db_session_dependency)) -> SearchLogRepository:
+async def get_search_log_repository(session: AsyncSession = Depends(get_session)) -> SearchLogRepository:
     return SearchLogRepository(session)
 
 
