@@ -1,5 +1,4 @@
 import unittest
-from unittest.mock import patch
 from services.search_service.domain.search_request import SearchQuery, MAX_SEARCH_QUERY_LENGTH
 
 
@@ -37,31 +36,6 @@ class TestSearchQuery(unittest.TestCase):
             SearchQuery(query_string=too_long_string)
 
         self.assertEqual(str(cm.exception), "Поисковой запрос слишком длинный")
-
-    def test_to_tsquery_string_returns_correct_format(self):
-        """Проверка, что метод to_tsquery_string возвращает исходную строку."""
-        # given
-        query_string = "тест с ! знаками . препинания :"
-
-        # when
-        query = SearchQuery(query_string=query_string)
-        tsquery_string = query.to_tsquery_string()
-
-        # then
-        self.assertEqual(tsquery_string, query_string)
-
-
-    def test_tsquery_func_returns_correct_function_name(self):
-        """Проверка, что метод tsquery_func возвращает правильное имя функции."""
-        # given
-        query_string = "тест" 
-
-        # when
-        query = SearchQuery(query_string=query_string)
-        func_name = query.tsquery_func()
-
-        # then
-        self.assertEqual(func_name, "plainto_tsquery")
 
 if __name__ == "__main__":
     unittest.main()

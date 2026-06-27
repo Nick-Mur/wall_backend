@@ -11,8 +11,8 @@ class ModerationLogRepository:
 
     async def save(self, message_id: UUID, result: ModerationResult):
         details = {
-            "warnings": [w.to_message() for w in result.warnings],
-            "reason": result.reason.to_message() if result.reason else None
+            "warnings": [w.message for w in result.warnings],
+            "reason": result.reason.message if result.reason else None
         }
 
         log_entry = ModerationLogModel(

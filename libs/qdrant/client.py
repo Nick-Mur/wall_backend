@@ -1,10 +1,11 @@
 # TODO: Реализовать фабрику Qdrant-клиента.
-from typing import Any, Dict, Optional
+from typing import Any
+
 from qdrant_client import AsyncQdrantClient
 
 
 class QdrantClientFactory:
-    def __init__(self, config: Dict[str, Any]):
+    def __init__(self, config: dict[str, Any]):
         # ищем qdrant в конфиге
         self._cfg = config.get("qdrant", {})
 

@@ -3,7 +3,6 @@ from uuid import UUID
 import uuid
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import List, Optional
 
 from services.message_service.domain.exceptions.references_validation_error import ReferencesValidationError
 from services.message_service.domain.exceptions.text_validation_error import TextValidationError
@@ -16,10 +15,10 @@ MAX_REFERENCES_COUNT = 20
 class Message:
     id: UUID
     text: str
-    author_id: Optional[UUID] = None
+    author_id: UUID | None = None
     hidden: bool = False
     created_at: datetime = field(default_factory=datetime.now)
-    references: List[UUID] = field(default_factory=list)
+    references: list[UUID] = field(default_factory=list)
 
     def __post_init__(self) -> None:
         self.text = self.text.strip()
@@ -27,7 +26,7 @@ class Message:
         self.references = self._deduplicate_references(self.references)
         self._validate_references()
 
-    def _deduplicate_references(self, references: Optional[List[UUID]]) -> List[UUID]:
+    def _deduplicate_references(self, references: list[UUID] | None) -> list[UUID]:
         if references is None:
             return []
         return list(dict.fromkeys(references))
@@ -62,8 +61,8 @@ class Message:
     @classmethod
     def create(cls,
                text: str,
-               references: Optional[List[UUID]] = None,
-               author_id: Optional[UUID] = None
+               references: list[UUID] | None = None,
+               author_id: UUID | None = None
                ) -> "Message":
         return cls(
             id=uuid.uuid4(),

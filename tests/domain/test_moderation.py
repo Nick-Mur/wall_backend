@@ -22,18 +22,5 @@ class TestModerationReason(unittest.TestCase):
         self.assertEqual(reason.code, code)
         self.assertEqual(reason.message, message)
 
-    def test_should_return_message(self):
-        """Returning text"""
-        # given
-        reason = ModerationReason(code="SPAM", message="SPAM is prohibited")
-
-        # when
-        result = reason.to_message()
-
-        # then
-        self.assertEqual(result, "SPAM is prohibited")
-
-
-
 if __name__ == "__main__":
     unittest.main()

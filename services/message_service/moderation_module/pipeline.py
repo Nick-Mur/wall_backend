@@ -1,10 +1,9 @@
-# TODO: Реализовать SoftModerationPipeline и HardModerationPipeline.
-from .base_pipeline import BaseModerationPipline
+from .base_pipeline import BaseModerationPipeline
 from .moderation_result import ModerationResult
 from ..domain.moderation import ModerationVerdict, ModerationReason, ModerationWarning
 
 
-class HardModerationPipeline(BaseModerationPipline):
+class HardModerationPipeline(BaseModerationPipeline):
     async def validate(self, text: str) -> ModerationResult:
         for step in self.steps:
             result = await step.process(text)
@@ -16,7 +15,7 @@ class HardModerationPipeline(BaseModerationPipline):
         return ModerationResult(verdict=ModerationVerdict.APPROVED)
 
 
-class SoftModerationPipeline(BaseModerationPipline):
+class SoftModerationPipeline(BaseModerationPipeline):
     async def validate(self, text: str) -> ModerationResult:
         warnings = []
         for step in self.steps:

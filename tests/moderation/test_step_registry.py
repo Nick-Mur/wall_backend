@@ -72,7 +72,7 @@ class TestRegistryStep(unittest.TestCase):
         with self.assertRaises(ValueError) as context:
             RegistryStep.create_step(step_name)
 
-        self.assertIn("Uknown step:", str(context.exception))
+        self.assertIn("Unknown step:", str(context.exception))
 
     def test_should_raise_error_for_empty_step_name(self):
         """Raise ValueError for empty step name"""
@@ -83,7 +83,7 @@ class TestRegistryStep(unittest.TestCase):
         with self.assertRaises(ValueError) as context:
             RegistryStep.create_step(step_name)
 
-        self.assertIn("Uknown step:", str(context.exception))
+        self.assertIn("Unknown step:", str(context.exception))
 
     def test_should_register_all_available_steps(self):
         """Check that all steps are registered"""

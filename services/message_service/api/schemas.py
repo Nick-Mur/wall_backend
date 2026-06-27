@@ -1,28 +1,30 @@
-# TODO: Описать Pydantic-схемы SubmitRequest, PublishRequest, MessageResponse.
-from pydantic import BaseModel, Field
 from uuid import UUID
-from typing import List, Optional
-from datetime import datetime
+
+from pydantic import BaseModel, Field, field_validator
 
 
 class SubmitRequest(BaseModel):
-    text: str = Field(..., max_length=5000)
-    references: List[UUID] = Field(default_factory=list)
-    author_id: Optional[UUID] = None
+    text: str = Field(..., min_length=1, max_length=5000)
+    references: list[UUID] = Field(default_factory=list)
+    author_id: UUID | None = None
 
+    @field_validator("text", mode="before")
+    @classmethod
+    def strip_and_validate_text(cls, value: object) -> object:
+        if not isinstance(value, str):
+            return value
 
-class PublishRequest(BaseModel):
-    text: str
-    references: List[UUID] = Field(default_factory=list)
-    author_id: Optional[UUID] = None
+        value = value.strip()
+        if not value:
+            raise ValueError("Text must not be empty")
+        return value
 
-class MessageResponse(BaseModel):
-    id: UUID
-    text: str
-    author_id: Optional[UUID] = None
-    created_at: datetime
-    hidden: bool
-    references: List[UUID]
-
-    class Config:
-        from_attributes = True
+    model_config = {
+        "json_schema_extra": {
+            "example": {
+                "text": "Привет, this is a searchable message",
+                "references": [],
+                "author_id": None,
+            }
+        }
+    }

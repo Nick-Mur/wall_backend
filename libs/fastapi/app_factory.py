@@ -1,7 +1,6 @@
-# TODO: Реализовать фабрику FastAPI-приложений.
-from fastapi import FastAPI
-from typing import List, Dict, Type, Callable, Optional
+from collections.abc import Callable
 
+from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 
 from .exception_handlers import handle_server_error, handle_validation_error
@@ -9,8 +8,8 @@ from .exception_handlers import handle_server_error, handle_validation_error
 
 def create_app(
         title: str,
-        routers: Optional[List] = None,
-        exception_handlers: Optional[Dict[Type[Exception], Callable]] = None
+        routers: list | None = None,
+        exception_handlers: dict[type[Exception], Callable] | None = None,
 ) -> FastAPI:
     app = FastAPI(title=title)
     app.add_exception_handler(RequestValidationError, handle_validation_error)

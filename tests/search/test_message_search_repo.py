@@ -56,7 +56,7 @@ class TestClassicSearchRepository(unittest.IsolatedAsyncioTestCase):
 
     async def test_count_total_results_uses_same_fts_and_hidden_filter(self):
         cursor = Mock()
-        cursor.scalar.return_value = 3
+        cursor.scalar_one.return_value = 3
         self.session.execute.return_value = cursor
 
         total = await self.repo.count_total_results(SearchQuery("hello"))

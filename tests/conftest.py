@@ -13,18 +13,13 @@ else:
     os.environ.setdefault("DATABASE_URL", "postgresql+asyncpg://wall:wall@localhost:5433/the_wall_test")
 
 from libs.postgres.base import Base
-from services.message_service.api.router import (
-    get_db_session_dependency as message_get_session_dependency,
-)
+from libs.postgres.session import get_session
 from services.message_service.infrastructure.db_models.message import MessageModel
 from services.message_service.infrastructure.db_models.message_hash import MessageHashModel
 from services.message_service.infrastructure.db_models.message_link import MessageLinkModel
 from services.message_service.infrastructure.db_models.moderation_log import ModerationLogModel
 from services.message_service.infrastructure.db_models.report import ReportModel
 from services.message_service.main import app as message_app
-from services.search_service.api.router import (
-    get_db_session_dependency as search_get_session_dependency,
-)
 from services.search_service.infrastructure.db_models.search_log import SearchLogModel
 from services.search_service.main import app as search_app
 
@@ -86,21 +81,21 @@ async def db_session(clean_db):
 
 @pytest_asyncio.fixture
 async def message_client(clean_db):
-    message_app.dependency_overrides[message_get_session_dependency] = override_get_session
+    message_app.dependency_overrides[get_session] = override_get_session
     transport = ASGITransport(app=message_app)
 
     async with AsyncClient(transport=transport, base_url="http://message.test") as client:
         yield client
 
-    message_app.dependency_overrides.pop(message_get_session_dependency, None)
+    message_app.dependency_overrides.pop(get_session, None)
 
 
 @pytest_asyncio.fixture
 async def search_client(clean_db):
-    search_app.dependency_overrides[search_get_session_dependency] = override_get_session
+    search_app.dependency_overrides[get_session] = override_get_session
     transport = ASGITransport(app=search_app)
 
     async with AsyncClient(transport=transport, base_url="http://search.test") as client:
         yield client
 
-    search_app.dependency_overrides.pop(search_get_session_dependency, None)
+    search_app.dependency_overrides.pop(get_session, None)

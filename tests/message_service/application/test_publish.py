@@ -21,6 +21,7 @@ class TestPublishMessage(unittest.TestCase):
         self.mock_hash_repo.exists = AsyncMock(return_value=False)
         self.mock_hash_repo.save = AsyncMock()
         self.mock_message_repo.save = AsyncMock()
+        self.mock_message_repo.missing_ids = AsyncMock(return_value=[])
         self.mock_indexer.index = AsyncMock()
 
         self.service = PublishMessage(
@@ -171,6 +172,23 @@ class TestPublishMessage(unittest.TestCase):
         # then
         self.assertEqual(result["status"], "published")
         self.assertEqual(result["warnings"], warnings)
+
+    def test_should_reject_missing_references(self):
+        text = "Message with missing reference"
+        missing_reference = uuid4()
+
+        self.mock_hard_pipe.validate = AsyncMock(return_value=Mock(is_rejected=False))
+        self.mock_message_repo.missing_ids = AsyncMock(return_value=[missing_reference])
+
+        result = asyncio.run(self.service.process(text, [missing_reference]))
+
+        self.assertEqual(result["status"], "error")
+        self.assertEqual(result["code"], 400)
+        self.assertIn(str(missing_reference), result["reason"])
+        self.mock_soft_pipe.validate.assert_not_called()
+        self.mock_message_repo.save.assert_not_called()
+        self.mock_hash_repo.save.assert_not_called()
+        self.mock_indexer.index.assert_not_called()
 
     def test_should_return_empty_warnings_list_when_no_warnings(self):
         """Should return empty warnings list when no warnings"""

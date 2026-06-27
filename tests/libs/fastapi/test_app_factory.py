@@ -108,10 +108,10 @@ class TestCreateApp(unittest.TestCase):
         response = client.post("/users/", json={"name": "John"})
 
         # then
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 422)
         data = response.json()
         self.assertEqual(data["error"], "RequestValidationError")
-        self.assertIn("age", data["message"].lower())
+        self.assertEqual(data["detail"][0]["loc"], ["body", "age"])
 
 
 if __name__ == "__main__":

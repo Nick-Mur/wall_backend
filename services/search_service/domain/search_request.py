@@ -1,4 +1,4 @@
-MAX_SEARCH_QUERY_LENGTH = 250 #надо потом перенести в отдельный файл с константами
+MAX_SEARCH_QUERY_LENGTH = 250
 
 class SearchQuery:
     """
@@ -16,16 +16,3 @@ class SearchQuery:
             raise ValueError(
                 f"Поисковой запрос слишком длинный")
 
-    def to_tsquery_string(self) -> str:
-        """
-        Преобразует строку запроса в формат, понятный tsquery PostgreSQL.
-        """
-        if not self.query_string:
-            return ""
-
-        return self.query_string
-
-    def tsquery_func(self) -> str:
-        """Возвращает функцию tsquery (в нашем случае для подстрокового поиска только plainto_tsquery)"""
-
-        return "plainto_tsquery"
